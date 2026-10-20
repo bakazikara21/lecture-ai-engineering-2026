@@ -15,14 +15,20 @@ import argparse
 from google import genai
 from google.genai import errors
 
-from app.config import MODEL, api_error_message, get_api_key
+from app.config import MODEL, api_error_message
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+api_key = os.getenv("GEMINI_API_KEY")
 
 # 講座に固有の質問。正しい答えは data/glossary.json の homework-levels にある
 DEFAULT_QUESTION = "AIE2026の講座の宿題にある「3レベル」とは何ですか？"
 
 
 def ask(question: str) -> str:
-    client = genai.Client(api_key=get_api_key())
+    client = genai.Client(api_key=api_key)
     response = client.models.generate_content(model=MODEL, contents=question)
 
     usage = response.usage_metadata
