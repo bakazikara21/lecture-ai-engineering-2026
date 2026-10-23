@@ -6,6 +6,7 @@
 
 回答後に次の質問を入力すると、同じ会話を続けられる。
 exit / quit、Ctrl+C、EOF で終了する。履歴は実行中だけ保持する。
+質問の送信から回答を受け取るまでの応答時間と、トークン数を表示する。
 
 ツールを持たない「素の」呼び出し。
 講座に固有のことを聞くと、「分からない」と答えるか、一般論でもっともらしく答える
@@ -14,6 +15,7 @@ exit / quit、Ctrl+C、EOF で終了する。履歴は実行中だけ保持す�
 """
 
 import argparse
+from time import perf_counter
 
 from google import genai
 from google.genai import errors
@@ -30,7 +32,10 @@ DEFAULT_QUESTION = "AIE2026の講座の宿題にある「3レベル」とは何�
 
 def ask(question: str, chat: Chat) -> str:
     """同じ chat を使い、過去の質問と回答も含めて送信する。"""
+    start = perf_counter()
     response = chat.send_message(question)
+    elapsed = perf_counter() - start
+    print(f"[応答時間] {elapsed:.2f} 秒")
 
     usage = response.usage_metadata
     if usage is not None:
