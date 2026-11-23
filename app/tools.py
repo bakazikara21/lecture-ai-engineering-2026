@@ -142,13 +142,16 @@ def search_materials(query: str) -> str:
     """第1〜3回の本講義資料を検索し、関連ページの本文・タイトル・ページ番号を返す。
 
     queryに調べたい内容を指定する。
+    resultsは質問に近い順の検索結果。neighborsはその前後のページで、説明の続きや前提を補う文脈として付けている。
+    neighborsは neighbor_of のページの前後にあたる。答えの根拠になるときだけ引用する。
     """
     from google.genai.errors import APIError
     import sqlite3
-    from app.retrieval import search
+    # 第5回宿題（実装）: search() に前後ページを付けた版を使う。前後ページ数は config の RAG_NEIGHBOR_WINDOW
+    from app.retrieval import search_with_neighbors
 
     try:
-        return json.dumps({"results": search(query)}, ensure_ascii=False)
+        return json.dumps(search_with_neighbors(query), ensure_ascii=False)
     except (ValueError, FileNotFoundError, sqlite3.Error) as e:
         return json.dumps({"error": str(e), "results": []}, ensure_ascii=False)
     except APIError as e:
