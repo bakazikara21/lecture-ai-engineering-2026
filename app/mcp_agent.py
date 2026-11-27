@@ -23,9 +23,12 @@ from pydantic_ai.mcp import MCPToolset, StdioTransport
 from pydantic_ai.messages import RetryPromptPart, ToolCallPart, ToolReturnPart
 from pydantic_ai.models.google import GoogleModel
 from pydantic_ai.models.test import TestModel
-from pydantic_ai.providers.google import GoogleProvider
+from dotenv import load_dotenv
 
-from app.config import MODEL, api_error_message, get_api_key
+from app.config import MODEL, api_error_message
+
+# Vertex AI の接続先（GOOGLE_CLOUD_PROJECT / GOOGLE_CLOUD_LOCATION）を .env から読むため
+load_dotenv()
 
 # 用語集サーバー（app/mcp_server.py）のツールを中心にした指示文。
 # 最後の 1 行は、設定ファイルに足したほかのサーバーのツールも使えるようにするためのもの
@@ -101,7 +104,10 @@ def build_mcp_agent(config_path: Path = MCP_CONFIG) -> Agent:
 
 
 def build_model() -> GoogleModel:
-    return GoogleModel(MODEL, provider=GoogleProvider(api_key=get_api_key()))
+    """Gemini のモデルを作る（Vertex AI 経由。認証は app.agent と共通の ADC で、API キーは使わない）。"""
+    # 関数内で import するのは、--list-tools（API キー不要）のときに app.agent（検索の索引など）を読み込まないため
+    from app.agent import build_provider
+    return GoogleModel(MODEL, provider=build_provider())
 
 
 def print_tools(target: Agent) -> None:

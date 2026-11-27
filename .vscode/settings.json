@@ -3,5 +3,20 @@
     "spellright.documentTypes": [
         "latex",
         "plaintext"
-    ]
+    ],
+     // Markdownファイルに限定した設定(他の言語の自動整形はそのまま維持される)
+    "[markdown]": {
+        // 保存時のフォーマッタ(Prettier等)の実行を無効化
+        "editor.formatOnSave": false,
+
+        // 保存時のコードアクション(markdownlintの自動修正など)も無効化
+        "editor.codeActionsOnSave": {
+        "source.fixAll": "never",
+        "source.fixAll.markdownlint": "never"
+        },
+
+        // 行末スペースの自動削除を無効化
+        // (Markdownでは行末の半角スペース2つが「改行」の意味を持つため消されると困る)
+        "files.trimTrailingWhitespace": false
+    }
 }
